@@ -1,0 +1,4 @@
+{
+    "title": "Welcome to React",
+    "withname": "Hi <strong>{{ name }}</strong>" 
+}

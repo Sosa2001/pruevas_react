@@ -1,0 +1,83 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.0.3",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".gitignore",
+        "hash": "13046175384202504187"
+      },
+      {
+        "file": "README.md",
+        "hash": "17496383698429813037"
+      },
+      {
+        "file": "eslint.config.js",
+        "hash": "10410409315448039573"
+      },
+      {
+        "file": "index.html",
+        "hash": "7575831410758623410"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "2346314349643188403"
+      },
+      {
+        "file": "package.json",
+        "hash": "6660992136847792681"
+      },
+      {
+        "file": "public/locales/en/welcome.json",
+        "hash": "3197891950884213646"
+      },
+      {
+        "file": "public/locales/es/welcome.json",
+        "hash": "11198038690980627275"
+      },
+      {
+        "file": "public/locales/fr/welcome.json",
+        "hash": "6605069469770376461"
+      },
+      {
+        "file": "public/vite.svg",
+        "hash": "16046085400642193116"
+      },
+      {
+        "file": "src/App.css",
+        "hash": "3739391659270974612"
+      },
+      {
+        "file": "src/App.jsx",
+        "hash": "15909732319645488093"
+      },
+      {
+        "file": "src/assets/react.svg",
+        "hash": "16069471864800376455"
+      },
+      {
+        "file": "src/config/i18next-config.js",
+        "hash": "10608429598732535547"
+      },
+      {
+        "file": "src/index.css",
+        "hash": "957896817323665666"
+      },
+      {
+        "file": "src/main.jsx",
+        "hash": "5705414199577878404"
+      },
+      {
+        "file": "vite.config.js",
+        "hash": "7008402861428644331"
+      },
+      {
+        "file": "yarn.lock",
+        "hash": "9522100598546357557"
+      }
+    ]
+  }
+}
