@@ -2,9 +2,9 @@ import ThreeDScene from './Components/Scene'; // Verifica la ruta si es necesari
 
 function App() {
   return (
-    <div className="App">
-      <ThreeDScene/>
-    </div>
+    <>
+        <ThreeDScene/>
+    </>
   );
 }
 

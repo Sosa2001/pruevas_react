@@ -18,6 +18,17 @@ const ThreeDScene = () => {
     // Create the scene
     const scene = new THREE.Scene();
 
+    scene.background = new THREE.CubeTextureLoader()
+      .setPath( '../../public/miramar/' )
+      .load( [
+            'miramar_ft.jpg',
+            'miramar_bk.jpg',
+            'miramar_up.jpg',
+            'miramar_dn.jpg',
+            'miramar_rt.jpg',
+            'miramar_lf.jpg'
+          ] );
+
     // Setup lighting
     const light = new THREE.DirectionalLight();
     light.intensity = 2;
@@ -37,7 +48,7 @@ const ThreeDScene = () => {
     camera.position.set(-5, 5, 25);
     camera.layers.enable(0); // Camera can see layer 0 only
     controls.target.set(-1, 2, 0);
-    controls.update();
+    controls.update(); 
 
     // Create floor and objects
     const floorGeometry = new THREE.PlaneGeometry(25, 20);
@@ -96,7 +107,7 @@ const ThreeDScene = () => {
         selectedObject.layers.set(1); // Change to layer 1, which is invisible to the camera
       }
     };
-
+    
     document.addEventListener('mousedown', onMouseDown);
 
     // Handle window resize
