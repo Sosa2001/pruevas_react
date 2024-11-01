@@ -1,35 +1,38 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Cambio en la ruta de importación
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const ThreeDScene = () => {
   const mountRef = useRef(null);
+  const [backgroundPath, setBackgroundPath] = useState('sunset'); // Fondo inicial
 
   useEffect(() => {
     const currentMount = mountRef.current;
 
-    // Setup renderer
+    // Configuración del renderer
     const renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     currentMount.appendChild(renderer.domElement);
 
-    // Create the scene
+    // Crear la escena
     const scene = new THREE.Scene();
 
-    scene.background = new THREE.CubeTextureLoader()
-      .setPath( '../../public/miramar/' )
-      .load( [
-            'miramar_ft.jpg',
-            'miramar_bk.jpg',
-            'miramar_up.jpg',
-            'miramar_dn.jpg',
-            'miramar_rt.jpg',
-            'miramar_lf.jpg'
-          ] );
+    // Función para cargar el fondo según el backgroundPath
+    const loadBackground = (path) => {
+      scene.background = new THREE.CubeTextureLoader()
+        .setPath(`../../public/${path}/`)
+        .load([
+          'ft.jpg', 'bk.jpg', 'up.jpg',
+          'dn.jpg', 'rt.jpg', 'lf.jpg'
+        ]);
+    };
 
-    // Setup lighting
+    // Cargar el fondo inicial
+    loadBackground(backgroundPath);
+
+    // Configuración de luces
     const light = new THREE.DirectionalLight();
     light.intensity = 2;
     light.position.set(2, 5, 10);
@@ -37,20 +40,21 @@ const ThreeDScene = () => {
     scene.add(light);
     scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
-    // Setup camera and controls
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      10000
-    );
-    const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.set(-5, 5, 25);
-    camera.layers.enable(0); // Camera can see layer 0 only
-    controls.target.set(-1, 2, 0);
-    controls.update(); 
+    // Configuración de cámara y controles
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+    const initialPosition = new THREE.Vector3(-5, 5, 25);
+    const bounds = {
+      x: { min: -100, max: 100 },
+      y: { min: -100, max: 100 },
+      z: { min: -100, max: 100 },
+    };
 
-    // Create floor and objects
+    camera.position.copy(initialPosition);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(-1, 2, 0);
+    controls.update();
+
+    // Crear objetos y piso
     const floorGeometry = new THREE.PlaneGeometry(25, 20);
     const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
     const cylinderGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2);
@@ -71,7 +75,7 @@ const ThreeDScene = () => {
       mesh.name = name;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      mesh.layers.set(layer); // Set initial layer
+      mesh.layers.set(layer); // Capa inicial
       return mesh;
     }
 
@@ -88,8 +92,8 @@ const ThreeDScene = () => {
     scene.add(boxes);
 
     const raycaster = new THREE.Raycaster();
-    
-    //important function that help me to know where is the mause
+
+    // Función para detectar clics en objetos
     const onMouseDown = (event) => {
       const coords = new THREE.Vector2(
         (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
@@ -102,15 +106,13 @@ const ThreeDScene = () => {
       if (intersections.length > 0) {
         const selectedObject = intersections[0].object;
         console.log(`${selectedObject.name} was clicked!`);
-
-        // Make the object "disappear" by moving it to layer 1
-        selectedObject.layers.set(1); // Change to layer 1, which is invisible to the camera
+        selectedObject.layers.set(1); // Mover objeto a una capa invisible para la cámara
       }
     };
-    
+
     document.addEventListener('mousedown', onMouseDown);
 
-    // Handle window resize
+    // Función para ajustar la ventana al redimensionar
     const onWindowResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -118,25 +120,56 @@ const ThreeDScene = () => {
     };
     window.addEventListener('resize', onWindowResize);
 
-    // Render loop
+    // Bucle de renderizado
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
+
+      // Verificar si la cámara está fuera de los límites
+      if (
+        camera.position.x < bounds.x.min || camera.position.x > bounds.x.max ||
+        camera.position.y < bounds.y.min || camera.position.y > bounds.y.max ||
+        camera.position.z < bounds.z.min || camera.position.z > bounds.z.max
+      ) {
+        camera.position.copy(initialPosition);
+        console.log("Camera position reset to initial state.");
+      }
+
       renderer.render(scene, camera);
     };
+    
     animate();
 
-    // Clean up on component unmount
+    // Limpieza al desmontar el componente
     return () => {
       document.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('resize', onWindowResize); // Cleanup resize listener
+      window.removeEventListener('resize', onWindowResize);
       if (currentMount && renderer.domElement) {
         currentMount.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [backgroundPath]);
 
-  return <div ref={mountRef}></div>;
+  // Cambiar el fondo cuando se selecciona un botón
+  const changeBackground = (path) => {
+    setBackgroundPath(path);
+  };
+
+  return (
+    <div>
+      <div ref={mountRef}></div>
+      <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+        <button onClick={() => changeBackground('clouds1')}>Clouds1</button>
+        <button onClick={() => changeBackground('daylight')}>Daylight</button>
+        <button onClick={() => changeBackground('miramar')}>Miramar</button>
+        <button onClick={() => changeBackground('nigth')}>Nigth</button>
+        <button onClick={() => changeBackground('skybox1')}>Skybox1</button>
+        <button onClick={() => changeBackground('skyhigh')}>Skyhigh</button>
+        <button onClick={() => changeBackground('stormy')}>Stormy</button>
+        <button onClick={() => changeBackground('sunset')}>Sunset</button>
+      </div>
+    </div>
+  );
 };
 
 export default ThreeDScene;
